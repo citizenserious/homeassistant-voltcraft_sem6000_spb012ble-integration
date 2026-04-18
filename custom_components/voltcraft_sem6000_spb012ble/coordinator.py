@@ -7,6 +7,7 @@ from dataclasses import dataclass, replace
 
 from bleak import BleakClient, BleakGATTCharacteristic
 from bleak.exc import BleakError
+
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceInfo
 from homeassistant.helpers.device_registry import format_mac
@@ -144,8 +145,8 @@ class VoltcraftDataUpdateCoordinator(DataUpdateCoordinator[VoltcraftData | None]
     async def _async_update_data(self) -> VoltcraftData | None:
         """Fetch data from the device.
 
-        This sends a measure command and returns the latest data. The actual data update
-        happens asynchronously via a notification handler.
+        This sends a measure command and returns the latest data. 
+        The actual data update happens asynchronously via a notification handler.
         """
 
         try:
