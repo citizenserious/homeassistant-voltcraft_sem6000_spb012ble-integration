@@ -145,7 +145,7 @@ class VoltcraftDataUpdateCoordinator(DataUpdateCoordinator[VoltcraftData | None]
     async def _async_update_data(self) -> VoltcraftData | None:
         """Fetch data from the device.
 
-        This sends a measure command and returns the latest data. 
+        This sends a measure command and returns the latest data.
         The actual data update happens asynchronously via a notification handler.
         """
 
