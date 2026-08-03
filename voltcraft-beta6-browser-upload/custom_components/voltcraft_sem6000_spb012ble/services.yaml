@@ -1,0 +1,192 @@
+set_timer:
+  name: Set timer
+  description: Turn the outlet on or off after a delay or at a specific date and time. Requires control permission for the outlet.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      description: Required only when more than one Voltcraft plug is configured.
+      example: 01J...
+      selector:
+        text:
+    action:
+      name: Action
+      required: true
+      selector:
+        select:
+          options:
+            - label: Turn on
+              value: "on"
+            - label: Turn off
+              value: "off"
+    seconds:
+      name: Delay in seconds
+      description: Use either this field or At, not both.
+      selector:
+        number:
+          min: 1
+          max: 31536000
+          mode: box
+    at:
+      name: At
+      description: Use either this field or Delay in seconds, not both.
+      selector:
+        datetime:
+stop_timer:
+  name: Stop timer
+  description: Disable the currently active timer. Requires control permission for the outlet.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+set_schedule:
+  name: Add or edit schedule
+  description: Add a schedule, or edit a slot from 1 through 12. Leave weekdays empty for a one-time schedule. Requires control permission for the outlet.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    slot:
+      name: Slot
+      description: Leave empty to add a new schedule; set 1–12 to edit an existing schedule.
+      selector:
+        number:
+          min: 1
+          max: 12
+          mode: box
+    active:
+      name: Active
+      default: true
+      selector:
+        boolean:
+    action:
+      name: Action
+      required: true
+      selector:
+        select:
+          options:
+            - label: Turn on
+              value: "on"
+            - label: Turn off
+              value: "off"
+    weekdays:
+      name: Weekdays
+      description: Comma-separated names such as mon,wed,fri. Leave empty for one-time execution.
+      selector:
+        text:
+    at:
+      name: Date and time
+      required: true
+      selector:
+        datetime:
+remove_schedule:
+  name: Remove schedule
+  description: Remove a schedule slot. Requires control permission for the outlet.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    slot:
+      name: Slot
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 12
+          mode: box
+set_random_mode:
+  name: Configure random mode
+  description: Configure the plug's random mode. Requires control permission for the outlet.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    active:
+      name: Active
+      required: true
+      selector:
+        boolean:
+    weekdays:
+      name: Weekdays
+      description: Comma-separated names such as mon,wed,fri.
+      selector:
+        text:
+    start:
+      name: Start
+      required: true
+      selector:
+        time:
+    end:
+      name: End
+      required: true
+      selector:
+        time:
+change_pin:
+  name: Change PIN
+  description: Change the four-digit device PIN and update the PIN stored by Home Assistant. Administrator access and explicit confirmation are required.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    new_pin:
+      name: New PIN
+      required: true
+      selector:
+        text:
+          type: password
+    confirm:
+      name: Confirm
+      required: true
+      selector:
+        boolean:
+reset_pin:
+  name: Reset PIN
+  description: Reset the device PIN to 0000 and update Home Assistant. Administrator access and explicit confirmation are required.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    confirm:
+      name: Confirm
+      required: true
+      selector:
+        boolean:
+reset_consumption:
+  name: Reset consumption data
+  description: Permanently erase the consumption history stored in the plug. Administrator access and explicit confirmation are required.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    confirm:
+      name: Confirm
+      required: true
+      selector:
+        boolean:
+factory_reset:
+  name: Factory reset
+  description: Permanently reset the plug, including settings and PIN. Administrator access and explicit confirmation are required.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
+    confirm:
+      name: Confirm
+      required: true
+      selector:
+        boolean:
+refresh_all:
+  name: Refresh all settings
+  description: Read settings, random mode, timer, serial number and schedules from the plug. Requires control permission for the outlet.
+  fields:
+    config_entry_id:
+      name: Config entry ID
+      selector:
+        text:
