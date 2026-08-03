@@ -1,0 +1,45 @@
+BETA 6 - UPLOAD NUR IM BROWSER
+================================
+
+Dieses ZIP ist ein Overlay fuer den aktuellen GitHub-main-Branch. Es enthaelt
+die fuer den Beta-6-Pull-Request benoetigten Dateien. Bereits identische Dateien
+erzeugen auf GitHub keinen Diff. Vorhandene andere Dateien im Repository nicht
+loeschen.
+
+1. Das ZIP auf dem Computer entpacken.
+2. In Dolphin mit Alt+. versteckte Dateien anzeigen, damit der Ordner .github
+   sichtbar ist.
+3. Im GitHub-Repository die Hauptseite oeffnen und kontrollieren, dass oben
+   main ausgewaehlt ist.
+4. Add file -> Upload files waehlen.
+5. Den gesamten Inhalt des entpackten Ordners in das Upload-Feld ziehen:
+
+   .github
+   custom_components
+   tests
+   README.md
+   SECURITY.md
+   pyproject.toml
+   requirements-dev.txt
+
+6. Im Commit-Dialog auswaehlen:
+
+   Create a new branch for this commit and start a pull request
+
+7. Branchname:
+
+   release/v2.0.0-beta.6
+
+8. Commit-Titel:
+
+   Add PIN management and security hardening for beta 6
+
+9. Den Pull Request erstellen, unter Files changed alle Aenderungen kontrollieren
+   und warten, bis saemtliche GitHub Actions beendet sind. Bei einer roten
+   Pruefung nicht mergen.
+
+10. Erst bei durchgehend gruenen Pruefungen mergen. Noch keinen GitHub-Release
+    und keinen Tag erstellen.
+
+11. Danach den gemergten main-Stand in Home Assistant installieren/aktualisieren,
+    Home Assistant neu starten und die separate Testcheckliste abarbeiten.
