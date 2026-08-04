@@ -1,6 +1,5 @@
 # Voltcraft SEM6000 / SPB012BLE Integration for Home Assistant
 
-
 An extended, independently maintained Home Assistant custom integration for the
 **Voltcraft SEM6000** and protocol-compatible **SPB012BLE** Bluetooth Low Energy
 power plugs.
@@ -13,13 +12,10 @@ power plugs.
 
 ## Project status
 
-The current release line is **2.0.0 beta**. It contains a substantially expanded
-protocol implementation and should be treated as a prerelease until it has been
-validated on more devices and Bluetooth environments.
-
-Development and testing are primarily performed with a Voltcraft SEM6000.
-SPB012BLE support is inherited from the upstream integration and is currently
-best effort; reports from SPB012BLE users are welcome.
+Version **2.0.0** is the first stable release of the extended integration. It has
+been validated with a Voltcraft SEM6000 using Home Assistant and an ESPHome
+Bluetooth proxy. SPB012BLE support is inherited from the upstream integration and
+remains best effort; compatibility reports are welcome.
 
 ## Features
 
@@ -29,7 +25,7 @@ best effort; reports from SPB012BLE users are welcome.
 - Outlet on/off control and state reporting
 - Power, voltage, current and frequency
 - Calculated power factor
-- Persistent total-energy reading from the device
+- Persistent total-energy reading from the plug
 - Automatic recovery after temporary disconnects or power loss
 
 ### Device settings
@@ -37,7 +33,7 @@ best effort; reports from SPB012BLE users are welcome.
 - Automatic device-time synchronization after an authenticated connection
 - Device name
 - Four-digit device PIN entry during setup
-- Administrator-only device PIN change and reset actions
+- GUI-based device PIN change and reset with post-change login verification
 - Night mode / LED ring control
 - Over-power limit from 1 to 4000 W
 - Over-power protection enable/disable control
@@ -46,8 +42,9 @@ best effort; reports from SPB012BLE users are welcome.
 
 ### Timers, schedules and random mode
 
-- Countdown timer read, start and stop operations
-- Read, add, edit and remove device schedules
+- Read, start and stop the plug's countdown timer
+- Start a timer after a duration or at a selected date and time
+- Read, add, edit and remove schedules stored in the plug
 - Random mode enable/disable control
 - Random-mode start and end times
 - Individual weekday switches for random mode
@@ -56,7 +53,8 @@ best effort; reports from SPB012BLE users are welcome.
 
 - Total energy suitable for Home Assistant long-term statistics
 - Device energy history for the last 24 hours, 30 days and 12 months
-- Device serial number, vendor, firmware and hardware information
+- Compatibility handling for the observed SEM6000 history-frame checksum quirk
+- Vendor, firmware and hardware information when reported by the plug
 - BLE connection mode and negotiated ATT MTU
 - Diagnostics for the app-compatible initialization sequence
 
@@ -65,10 +63,13 @@ from the Home Assistant entity registry when needed.
 
 ## Known limitations
 
-- The integration is still a prerelease and has mainly been tested with one
-  SEM6000 hardware environment.
-- The tested SEM6000 settings response does not reliably report the current
-  over-power-protection state. The integration therefore preserves the last
+- Development and device validation have primarily used one Voltcraft SEM6000.
+- The tested SEM6000 does not expose a usable serial number over either the
+  standard Bluetooth Device Information Service or the documented proprietary
+  command. The integration therefore uses the Bluetooth MAC address as its stable
+  device identifier and does not create a serial-number entity.
+- The tested settings response does not reliably report the current
+  over-power-protection state. The integration preserves the last
   command-confirmed state instead of forcing the switch back to off.
 - Calibration and firmware updates are not implemented.
 - The official Voltcraft app and Home Assistant should not control the plug at
@@ -93,9 +94,8 @@ from the Home Assistant entity registry when needed.
    ```
 
 3. Install **Voltcraft SEM6000 / SPB012BLE**.
-4. Select the prerelease version when installing a beta release.
-5. Restart Home Assistant.
-6. Open **Settings -> Devices & services** and configure the discovered plug.
+4. Restart Home Assistant.
+5. Open **Settings -> Devices & services** and configure the discovered plug.
 
 ### Manual installation
 
@@ -126,44 +126,76 @@ restart Home Assistant. Do not remove the configured Home Assistant integration
 unless normal replacement fails, because removing it can also remove registry
 entries and entity customizations.
 
-The migration path has not yet been validated across every upstream version.
 Check entity IDs, automations and the Energy dashboard after the first restart.
 
-## Configuration and PIN
+## Configuration and advanced controls
 
-The integration is configured through the Home Assistant UI. Setup asks for the
-plug's four-digit PIN in a masked password field. The factory default is `0000`.
-Only ASCII digits are accepted.
+The integration is configured entirely through the Home Assistant UI. Setup asks
+for the plug's four-digit PIN in a masked password field. The factory default is
+`0000`; only ASCII decimal digits are accepted.
 
-The integration options contain a blank password field for updating the PIN that
-Home Assistant uses to log in. The stored PIN is deliberately not returned to the
-browser. Leaving the field empty keeps the current value.
+Open **Settings -> Devices & services -> Voltcraft SEM6000 / SPB012BLE ->
+Configure** for the advanced control menu:
 
-To change the PIN on the plug itself, use the administrator-only **Change PIN**
-action and enable its confirmation field. After the device acknowledges the change,
-the integration disconnects and verifies the new PIN through a fresh BLE login. 
-The new PIN is stored and the config entry is reloaded only after that login succeeds. 
-If verification fails, the integration tests the previous PIN and leaves the stored value unchanged.
-**Reset PIN**, consumption reset and factory reset are also restricted to Home
-Assistant administrators and require explicit confirmation.
+- **Device access**: set the PIN Home Assistant uses to log in, change the PIN on
+  the plug, or reset the plug PIN to `0000`.
+- **Timer**: create a countdown timer, schedule a switch operation for a date and
+  time, inspect the active timer, or stop it.
+- **Schedules**: add, edit and remove schedules stored in the plug, including a
+  normal weekday multi-selection.
+- **Maintenance**: reset consumption data or restore factory settings using
+  explicit warning and confirmation forms.
 
-Run PIN changes interactively. Do not place a PIN in YAML automations, scripts or
-blueprints because action data and traces can retain a clear-text copy.
+Random mode, tariffs, night mode, over-power settings and outlet control remain
+normal entities on the device page. Device-time synchronization and complete
+state refresh run automatically after an authenticated connection and are not
+exposed as manual buttons.
 
-The PIN is stored in the Home Assistant config entry and is therefore included in
-Home Assistant backups. Masking prevents casual disclosure in the UI; it is not
-additional encryption. The device protocol uses only four digits, so Home
-Assistant account security and physical BLE proximity remain important.
+Version 2.0.0 registers **no Voltcraft-specific services** under **Developer
+tools -> Actions** and no Voltcraft button platform. Standard Home Assistant
+entity actions such as `switch.turn_on` remain available for normal entities.
 
-## Services and advanced functions
+### PIN transaction behavior
 
-Timer and schedule operations are exposed through integration actions. Their
-current state is also available through the Timer and Schedules entities. Use
-Home Assistant's **Developer tools -> Actions** view to inspect the available
-fields and target the correct Voltcraft device.
+Some SEM6000 firmware applies a PIN change without returning the expected
+acknowledgement before the command timeout. The integration therefore treats the
+resulting device state as authoritative:
 
-Routine device actions require control permission for the plug's outlet entity.
-Credential changes and destructive reset actions require administrator access.
+1. send the PIN-changing command;
+2. disconnect and allow the plug to settle;
+3. authenticate through a fresh BLE connection using the candidate PIN;
+4. store the candidate PIN only after that login succeeds;
+5. if it fails, test the previous PIN and leave the stored value unchanged.
+
+The same verified transaction is used for PIN reset and factory reset. A missing
+acknowledgement is no longer reported as a definitive failure when the new PIN
+actually works.
+
+The stored PIN is never returned to the browser. **Set the PIN used by Home
+Assistant** is a repair function only; it does not change the PIN on the plug.
+The PIN is stored in the Home Assistant config entry and is included in Home
+Assistant backups. UI masking prevents casual disclosure but is not additional
+encryption.
+
+### History-frame compatibility
+
+The tested SEM6000 returns the 24-hour and 12-month history in 55-byte responses
+and the 30-day history in a 127-byte response. Their checksums do not follow the
+normal protocol formula. Version 2.0.0 accepts this exception only for read-only
+history commands `0x0A`, `0x0B` and `0x0C` when the header, declared length,
+subcommand and `FFFF` suffix are valid.
+
+Authentication, settings, switching and all state-changing commands keep strict
+checksum validation. Each history range is requested independently, so a timeout
+for one range does not suppress the other two.
+
+### Bluetooth startup recovery
+
+An ESPHome Bluetooth proxy can briefly reject notification subscription while its
+scanner or another BLE connection is still settling after a Home Assistant
+restart. One matching `GATT Protocol Error: Unlikely Error` during initial setup
+is treated as transient and retried after a short delay. Repeated failures are
+still reported normally.
 
 ## Debug logging
 
@@ -190,7 +222,7 @@ When reporting a problem, include:
 - Device model, hardware version and firmware version when available
 - Bluetooth path used: local adapter or proxy
 - Relevant debug log section with private data removed
-- Exact action that triggered the problem
+- Exact GUI operation or entity action that triggered the problem
 
 Please report issues in this repository, not in the upstream repository, when
 they concern features or releases provided only by this fork.

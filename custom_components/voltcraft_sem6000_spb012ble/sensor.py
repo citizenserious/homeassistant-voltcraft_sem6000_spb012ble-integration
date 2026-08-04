@@ -19,6 +19,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -85,13 +86,6 @@ SENSORS: tuple[VoltcraftSensorEntityDescription, ...] = (
         value_fn=lambda data: data.consumed_energy,
     ),
     VoltcraftSensorEntityDescription(
-        key="serial",
-        name="Serial number",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
-        value_fn=lambda data: data.serial,
-    ),
-    VoltcraftSensorEntityDescription(
         key="vendor",
         name="Vendor",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -131,7 +125,9 @@ SENSORS: tuple[VoltcraftSensorEntityDescription, ...] = (
         name="App-compatible initialization",
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        value_fn=lambda data: "complete" if data.app_initialization_complete else "incomplete",
+        value_fn=lambda data: (
+            "complete" if data.app_initialization_complete else "incomplete"
+        ),
     ),
     VoltcraftSensorEntityDescription(
         key="app_cccd_handshake",
@@ -168,12 +164,39 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     coordinator: VoltcraftDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+    # Version 2.0.0 no longer exposes a serial-number sensor because the tested SEM6000
+    # firmware does not provide a usable serial through either known BLE path.
+    # Remove the legacy registry entry so an already enabled entity does not stay
+    # behind as an unavailable or permanently unknown diagnostic entity.
+    entity_registry = er.async_get(hass)
+    legacy_serial_entity_id = entity_registry.async_get_entity_id(
+        "sensor", DOMAIN, f"{coordinator.mac}_serial"
+    )
+    if legacy_serial_entity_id is not None:
+        entity_registry.async_remove(legacy_serial_entity_id)
+
     async_add_entities(
         [VoltcraftSensor(coordinator, description) for description in SENSORS]
         + [
-            VoltcraftHistorySensor(coordinator, "history_24h", "Energy history 24 hours", "history_24h_wh"),
-            VoltcraftHistorySensor(coordinator, "history_30d", "Energy history 30 days", "history_30d_wh"),
-            VoltcraftHistorySensor(coordinator, "history_12m", "Energy history 12 months", "history_12m_wh"),
+            VoltcraftHistorySensor(
+                coordinator,
+                "history_24h",
+                "Energy history 24 hours",
+                "history_24h_wh",
+            ),
+            VoltcraftHistorySensor(
+                coordinator,
+                "history_30d",
+                "Energy history 30 days",
+                "history_30d_wh",
+            ),
+            VoltcraftHistorySensor(
+                coordinator,
+                "history_12m",
+                "Energy history 12 months",
+                "history_12m_wh",
+            ),
             VoltcraftTimerSensor(coordinator),
             VoltcraftSchedulesSensor(coordinator),
         ]
@@ -292,7 +315,11 @@ class VoltcraftSchedulesSensor(VoltcraftCoordinatorEntity, SensorEntity):
                     "action": "turn_on" if item.turn_on else "turn_off",
                     "weekdays": list(weekdays_from_mask(item.weekday_mask)),
                     "time": item.at_time.isoformat(timespec="minutes"),
-                    "datetime": item.when.isoformat(timespec="minutes") if item.when else None,
+                    "datetime": (
+                        item.when.isoformat(timespec="minutes")
+                        if item.when
+                        else None
+                    ),
                 }
             )
         return {"entries": entries}
