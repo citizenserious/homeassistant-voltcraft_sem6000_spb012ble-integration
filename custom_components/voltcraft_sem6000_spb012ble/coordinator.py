@@ -45,7 +45,6 @@ from .protocol import (
     ScheduleStatusNotifyPayload,
     SerialNotifyPayload,
     SettingsNotifyPayload,
-    SettingsOperation,
     SwitchModes,
     TimerAction,
     TimerStatusNotifyPayload,
