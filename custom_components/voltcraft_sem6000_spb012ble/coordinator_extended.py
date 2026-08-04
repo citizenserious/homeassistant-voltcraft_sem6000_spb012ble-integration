@@ -40,12 +40,19 @@ class VoltcraftDataUpdateCoordinator(BaseVoltcraftDataUpdateCoordinator):
 
     @staticmethod
     def _is_transient_notification_subscription_error(err: Exception) -> bool:
-        """Return whether a connection failure matches the observed proxy race."""
+        """Return whether startup notification setup hit the observed proxy race.
+
+        Depending on the Bluetooth backend, the same transient startup failure is
+        reported either as GATT ``UNLIKELY_ERROR`` or as a bare ``TimeoutError``
+        with an empty message.  Only failures explicitly raised during the
+        notification-subscription stage are eligible for the one-time deferral.
+        """
         detail = str(err)
-        return (
-            "notification subscription" in detail
-            and ("Unlikely Error" in detail or "UNLIKELY_ERROR" in detail)
-        )
+        if "notification subscription" not in detail:
+            return False
+        if "Unlikely Error" in detail or "UNLIKELY_ERROR" in detail:
+            return True
+        return isinstance(err.__cause__, TimeoutError)
 
     async def _async_update_data(self) -> VoltcraftData | None:
         """Treat one startup notification error as a transient proxy condition.

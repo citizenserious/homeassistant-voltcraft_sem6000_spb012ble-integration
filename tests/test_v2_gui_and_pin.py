@@ -184,6 +184,50 @@ class PinTimeoutRegressionTests(unittest.IsolatedAsyncioTestCase):
         )
 
 
+class _StartupUpdateFailed(Exception):
+    """Stand-in for Home Assistant's UpdateFailed with chained causes."""
+
+
+class StartupNotificationRecoveryTests(unittest.TestCase):
+    _is_transient = staticmethod(
+        _load_method(
+            EXTENDED_COORDINATOR,
+            "VoltcraftDataUpdateCoordinator",
+            "_is_transient_notification_subscription_error",
+            {},
+        )
+    )
+
+    def test_unlikely_error_is_treated_as_transient(self) -> None:
+        error = _StartupUpdateFailed(
+            "Failed to connect during notification subscription: "
+            "GATT Protocol Error: Unlikely Error"
+        )
+        self.assertTrue(self._is_transient(error))
+
+    def test_empty_timeout_during_notification_subscription_is_transient(self) -> None:
+        try:
+            raise TimeoutError
+        except TimeoutError as cause:
+            try:
+                raise _StartupUpdateFailed(
+                    "Failed to connect during notification subscription: "
+                ) from cause
+            except _StartupUpdateFailed as error:
+                self.assertTrue(self._is_transient(error))
+
+    def test_timeout_in_other_connection_stage_is_not_suppressed(self) -> None:
+        try:
+            raise TimeoutError
+        except TimeoutError as cause:
+            try:
+                raise _StartupUpdateFailed(
+                    "Failed to connect during transport and service discovery: "
+                ) from cause
+            except _StartupUpdateFailed as error:
+                self.assertFalse(self._is_transient(error))
+
+
 class _HistoryKind(Enum):
     DAY = "day"
     MONTH = "month"
