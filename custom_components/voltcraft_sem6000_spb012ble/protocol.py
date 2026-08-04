@@ -174,10 +174,10 @@ def validate_notify_frame(payload: bytes | bytearray) -> bytes:
         # shapes after the generic header, length and FFFF-suffix checks above.
         # Every command that changes state, authenticates or acknowledges an
         # operation keeps strict checksum validation.
-        history_shapes = {
-            Command.CONSUMPTION_DAY: (0x33, 55, 52),
-            Command.CONSUMPTION_MONTH: (0x7B, 127, 124),
-            Command.CONSUMPTION_YEAR: (0x33, 55, 52),
+        history_shapes: dict[int, tuple[int, int, int]] = {
+            int(Command.CONSUMPTION_DAY): (0x33, 55, 52),
+            int(Command.CONSUMPTION_MONTH): (0x7B, 127, 124),
+            int(Command.CONSUMPTION_YEAR): (0x33, 55, 52),
         }
         is_observed_history_frame = (
             subcommand == 0

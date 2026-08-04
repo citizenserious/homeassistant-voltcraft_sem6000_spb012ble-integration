@@ -77,9 +77,9 @@ class PackageConsistencyTests(unittest.TestCase):
     def test_history_protocol_fix_is_included(self) -> None:
         source = (COMPONENT / "protocol.py").read_text(encoding="utf-8")
         self.assertIn("is_observed_history_frame", source)
-        self.assertIn("Command.CONSUMPTION_DAY: (0x33, 55, 52)", source)
-        self.assertIn("Command.CONSUMPTION_MONTH: (0x7B, 127, 124)", source)
-        self.assertIn("Command.CONSUMPTION_YEAR: (0x33, 55, 52)", source)
+        self.assertIn("int(Command.CONSUMPTION_DAY): (0x33, 55, 52)", source)
+        self.assertIn("int(Command.CONSUMPTION_MONTH): (0x7B, 127, 124)", source)
+        self.assertIn("int(Command.CONSUMPTION_YEAR): (0x33, 55, 52)", source)
 
 
     def test_datetime_forms_use_separate_date_and_time_selectors(self) -> None:
