@@ -29,18 +29,214 @@
   "options": {
     "step": {
       "init": {
-        "title": "Device authentication",
-        "description": "Update only the PIN Home Assistant uses to log in. Leave the field empty to keep the stored PIN. Use the Change PIN action to change the PIN on the plug itself.",
+        "title": "Voltcraft device configuration",
+        "menu_options": {
+          "access": "Device access",
+          "timer": "Timer",
+          "schedule": "Schedules",
+          "maintenance": "Maintenance"
+        }
+      },
+      "access": {
+        "title": "Device access",
+        "menu_options": {
+          "login_pin": "Set login PIN for Home Assistant",
+          "change_pin": "Change PIN on the plug",
+          "reset_pin": "Reset plug PIN to 0000",
+          "back_to_overview": "Back to device overview"
+        }
+      },
+      "timer": {
+        "title": "Timer",
+        "menu_options": {
+          "timer_delay": "Start timer after a duration",
+          "timer_at": "Start timer for a date and time",
+          "timer_stop": "Stop active timer",
+          "back_to_overview": "Back to device overview"
+        },
+        "description": "Current timer: {timer_status}"
+      },
+      "schedule": {
+        "title": "Schedules",
+        "menu_options": {
+          "schedule_add": "Add schedule",
+          "schedule_edit_select": "Edit schedule",
+          "schedule_remove": "Remove schedule",
+          "back_to_overview": "Back to device overview"
+        }
+      },
+      "maintenance": {
+        "title": "Maintenance",
+        "menu_options": {
+          "reset_consumption": "Reset device consumption data",
+          "factory_reset": "Factory-reset the plug",
+          "back_to_overview": "Back to device overview"
+        }
+      },
+      "login_pin": {
+        "title": "Login PIN used by Home Assistant",
+        "description": "Set the PIN Home Assistant uses to log in to the plug. This does not change the PIN on the plug. Use this only when the plug PIN was changed outside Home Assistant and the connection therefore fails.",
         "data": {
-          "pin": "Four-digit PIN"
+          "pin": "Current PIN of the plug"
         },
         "data_description": {
-          "pin": "The existing PIN is never returned to the browser."
+          "pin": "The PIN currently stored in Home Assistant is not shown for security reasons."
+        },
+        "submit": "Save PIN"
+      },
+      "change_pin": {
+        "title": "Change PIN on the plug",
+        "description": "The plug may change its PIN without returning an acknowledgement. Home Assistant therefore reconnects with the new PIN and stores it only after that login succeeds.",
+        "data": {
+          "new_pin": "New four-digit PIN",
+          "repeat_pin": "Repeat new PIN"
+        },
+        "submit": "Change PIN"
+      },
+      "reset_pin": {
+        "title": "Reset plug PIN",
+        "description": "Reset the PIN stored on the plug to the factory default 0000. Home Assistant verifies the result through a fresh login.",
+        "data": {
+          "confirm": "I understand and want to reset the PIN"
+        },
+        "submit": "Reset PIN"
+      },
+      "timer_delay": {
+        "title": "Start timer after a duration",
+        "description": "Set the switching action and duration explicitly.",
+        "data": {
+          "action": "Action after the delay",
+          "duration": "Delay"
+        },
+        "submit": "Start timer",
+        "data_description": {
+          "duration": "Enter the duration as days, hours, minutes and seconds."
         }
+      },
+      "timer_at": {
+        "title": "Start timer for a date and time",
+        "description": "Set the switching action, date and time explicitly.",
+        "data": {
+          "action": "Action",
+          "date": "Date",
+          "time": "Time"
+        },
+        "submit": "Start timer"
+      },
+      "timer_stop": {
+        "title": "Stop active timer",
+        "description": "Submit this form to stop the timer currently stored on the plug.",
+        "submit": "Stop timer"
+      },
+      "schedule_add": {
+        "title": "Add schedule",
+        "description": "Create a one-time or repeating schedule on the plug.",
+        "data": {
+          "status": "Status",
+          "action": "Action",
+          "date": "Date",
+          "time": "Time",
+          "weekdays": "Repeat on weekdays"
+        },
+        "data_description": {
+          "date": "Used for a one-time schedule. For a repeating weekday schedule, the plug ignores the date.",
+          "weekdays": "Leave empty for a one-time schedule. Select one or more weekdays for a repeating schedule."
+        },
+        "submit": "Add schedule"
+      },
+      "schedule_edit_select": {
+        "title": "Select schedule",
+        "data": {
+          "slot": "Schedule"
+        },
+        "submit": "Continue"
+      },
+      "schedule_edit": {
+        "title": "Edit schedule",
+        "description": "Change the selected schedule stored on the plug.",
+        "data": {
+          "status": "Status",
+          "action": "Action",
+          "date": "Date",
+          "time": "Time",
+          "weekdays": "Repeat on weekdays"
+        },
+        "data_description": {
+          "date": "Used for a one-time schedule. For a repeating weekday schedule, the plug ignores the date.",
+          "weekdays": "Leave empty for a one-time schedule. Select one or more weekdays for a repeating schedule."
+        },
+        "submit": "Save changes"
+      },
+      "schedule_remove": {
+        "title": "Remove schedule",
+        "description": "Permanently remove the selected schedule from the plug.",
+        "data": {
+          "slot": "Schedule",
+          "confirm": "I understand and want to remove this schedule"
+        },
+        "submit": "Remove schedule"
+      },
+      "reset_consumption": {
+        "title": "Reset device consumption data",
+        "description": "This resets the consumption history and total energy stored in the plug. Home Assistant history that has already been recorded is not deleted.",
+        "data": {
+          "confirm": "I understand that the device data will be reset"
+        },
+        "submit": "Reset consumption data"
+      },
+      "factory_reset": {
+        "title": "Factory-reset the plug",
+        "description": "This resets device settings and the PIN. Home Assistant will verify the factory PIN 0000 after the command. Use only with a non-critical load.",
+        "data": {
+          "confirm": "I understand and want to factory-reset the plug"
+        },
+        "submit": "Factory reset"
       }
     },
     "error": {
-      "invalid_pin": "The PIN must contain exactly four decimal digits."
+      "invalid_pin": "The PIN must contain exactly four decimal digits.",
+      "pin_mismatch": "The two PIN entries do not match.",
+      "invalid_duration": "The duration must be between one second and 365 days.",
+      "confirmation_required": "Enable the confirmation field before continuing.",
+      "operation_failed": "The operation failed: {error}",
+      "invalid_datetime": "The selected date or time is invalid."
+    },
+    "abort": {
+      "pin_changed": "The plug accepted the new PIN and Home Assistant verified it through a fresh login.",
+      "pin_reset": "The plug PIN was reset to 0000 and verified.",
+      "timer_started": "The timer was stored on the plug.",
+      "timer_stopped": "The timer was stopped.",
+      "schedule_saved": "The schedule was stored on the plug.",
+      "schedule_removed": "The schedule was removed from the plug.",
+      "no_schedules": "The plug currently reports no schedules that can be edited or removed.",
+      "schedule_load_failed": "The schedules could not be loaded: {error}",
+      "consumption_reset": "The consumption data stored on the plug was reset.",
+      "factory_reset": "The factory reset completed and the default PIN 0000 was verified."
+    }
+  },
+  "selector": {
+    "switch_action": {
+      "options": {
+        "turn_on": "Turn on",
+        "turn_off": "Turn off"
+      }
+    },
+    "schedule_status": {
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    },
+    "weekdays": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
     }
   }
 }

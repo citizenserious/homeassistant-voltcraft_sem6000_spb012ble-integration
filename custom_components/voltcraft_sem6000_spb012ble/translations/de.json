@@ -29,18 +29,214 @@
   "options": {
     "step": {
       "init": {
-        "title": "Geräteauthentifizierung",
-        "description": "Hier wird nur die von Home Assistant für die Anmeldung verwendete PIN aktualisiert. Das Feld leer lassen, um die gespeicherte PIN beizubehalten. Die PIN am Gerät selbst wird über die Aktion „PIN ändern“ geändert.",
+        "title": "Voltcraft-Gerätekonfiguration",
+        "menu_options": {
+          "access": "Gerätezugang",
+          "timer": "Timer",
+          "schedule": "Zeitpläne",
+          "maintenance": "Wartung"
+        }
+      },
+      "access": {
+        "title": "Gerätezugang",
+        "menu_options": {
+          "login_pin": "Anmelde-PIN für Home Assistant festlegen",
+          "change_pin": "PIN am Stecker ändern",
+          "reset_pin": "Stecker-PIN auf 0000 zurücksetzen",
+          "back_to_overview": "Zurück zur Geräteübersicht"
+        }
+      },
+      "timer": {
+        "title": "Timer",
+        "menu_options": {
+          "timer_delay": "Timer nach einer Dauer starten",
+          "timer_at": "Timer für Datum und Uhrzeit starten",
+          "timer_stop": "Aktiven Timer stoppen",
+          "back_to_overview": "Zurück zur Geräteübersicht"
+        },
+        "description": "Aktueller Timer: {timer_status}"
+      },
+      "schedule": {
+        "title": "Zeitpläne",
+        "menu_options": {
+          "schedule_add": "Zeitplan hinzufügen",
+          "schedule_edit_select": "Zeitplan bearbeiten",
+          "schedule_remove": "Zeitplan entfernen",
+          "back_to_overview": "Zurück zur Geräteübersicht"
+        }
+      },
+      "maintenance": {
+        "title": "Wartung",
+        "menu_options": {
+          "reset_consumption": "Verbrauchsdaten des Geräts zurücksetzen",
+          "factory_reset": "Stecker auf Werkseinstellungen zurücksetzen",
+          "back_to_overview": "Zurück zur Geräteübersicht"
+        }
+      },
+      "login_pin": {
+        "title": "Von Home Assistant verwendete Anmelde-PIN",
+        "description": "Hier legst du fest, mit welcher PIN sich Home Assistant am Stecker anmeldet. Die PIN am Stecker wird dadurch nicht geändert. Nutze diese Funktion nur, wenn die PIN am Stecker außerhalb von Home Assistant geändert wurde und die Verbindung deshalb fehlschlägt.",
         "data": {
-          "pin": "Vierstellige PIN"
+          "pin": "Aktuelle PIN des Steckers"
         },
         "data_description": {
-          "pin": "Die vorhandene PIN wird niemals an den Browser zurückgegeben."
+          "pin": "Die bisher in Home Assistant gespeicherte PIN wird aus Sicherheitsgründen nicht angezeigt."
+        },
+        "submit": "PIN speichern"
+      },
+      "change_pin": {
+        "title": "PIN am Stecker ändern",
+        "description": "Der Stecker kann die PIN ändern, ohne eine Bestätigung zurückzugeben. Home Assistant verbindet sich deshalb anschließend mit der neuen PIN und speichert sie erst nach erfolgreicher Anmeldung.",
+        "data": {
+          "new_pin": "Neue vierstellige PIN",
+          "repeat_pin": "Neue PIN wiederholen"
+        },
+        "submit": "PIN ändern"
+      },
+      "reset_pin": {
+        "title": "Stecker-PIN zurücksetzen",
+        "description": "Die im Stecker gespeicherte PIN auf die Werkseinstellung 0000 zurücksetzen. Home Assistant prüft das Ergebnis durch eine neue Anmeldung.",
+        "data": {
+          "confirm": "Ich habe verstanden und möchte die PIN zurücksetzen"
+        },
+        "submit": "PIN zurücksetzen"
+      },
+      "timer_delay": {
+        "title": "Timer nach einer Dauer starten",
+        "description": "Schaltaktion und Dauer vollständig festlegen.",
+        "data": {
+          "action": "Aktion nach Ablauf",
+          "duration": "Verzögerung"
+        },
+        "submit": "Timer starten",
+        "data_description": {
+          "duration": "Dauer in Tagen, Stunden, Minuten und Sekunden eingeben."
         }
+      },
+      "timer_at": {
+        "title": "Timer für Datum und Uhrzeit starten",
+        "description": "Schaltaktion, Datum und Uhrzeit vollständig festlegen.",
+        "data": {
+          "action": "Aktion",
+          "date": "Datum",
+          "time": "Uhrzeit"
+        },
+        "submit": "Timer starten"
+      },
+      "timer_stop": {
+        "title": "Aktiven Timer stoppen",
+        "description": "Dieses Formular absenden, um den aktuell im Stecker gespeicherten Timer zu stoppen.",
+        "submit": "Timer stoppen"
+      },
+      "schedule_add": {
+        "title": "Zeitplan hinzufügen",
+        "description": "Einen einmaligen oder wiederkehrenden Zeitplan im Stecker anlegen.",
+        "data": {
+          "status": "Status",
+          "action": "Aktion",
+          "date": "Datum",
+          "time": "Uhrzeit",
+          "weekdays": "Wiederholen an"
+        },
+        "data_description": {
+          "date": "Wird für einen einmaligen Zeitplan verwendet. Bei einem Wochenplan ignoriert der Stecker das Datum.",
+          "weekdays": "Leer lassen für einen einmaligen Zeitplan. Einen oder mehrere Wochentage für einen wiederkehrenden Zeitplan auswählen."
+        },
+        "submit": "Zeitplan hinzufügen"
+      },
+      "schedule_edit_select": {
+        "title": "Zeitplan auswählen",
+        "data": {
+          "slot": "Zeitplan"
+        },
+        "submit": "Weiter"
+      },
+      "schedule_edit": {
+        "title": "Zeitplan bearbeiten",
+        "description": "Den ausgewählten Zeitplan im Stecker bearbeiten.",
+        "data": {
+          "status": "Status",
+          "action": "Aktion",
+          "date": "Datum",
+          "time": "Uhrzeit",
+          "weekdays": "Wiederholen an"
+        },
+        "data_description": {
+          "date": "Wird für einen einmaligen Zeitplan verwendet. Bei einem Wochenplan ignoriert der Stecker das Datum.",
+          "weekdays": "Leer lassen für einen einmaligen Zeitplan. Einen oder mehrere Wochentage für einen wiederkehrenden Zeitplan auswählen."
+        },
+        "submit": "Änderungen speichern"
+      },
+      "schedule_remove": {
+        "title": "Zeitplan entfernen",
+        "description": "Den ausgewählten Zeitplan dauerhaft aus dem Stecker entfernen.",
+        "data": {
+          "slot": "Zeitplan",
+          "confirm": "Ich habe verstanden und möchte diesen Zeitplan entfernen"
+        },
+        "submit": "Zeitplan entfernen"
+      },
+      "reset_consumption": {
+        "title": "Verbrauchsdaten des Geräts zurücksetzen",
+        "description": "Dies setzt den im Stecker gespeicherten Verbrauchsverlauf und Gesamtverbrauch zurück. Bereits in Home Assistant aufgezeichnete Verlaufsdaten werden nicht gelöscht.",
+        "data": {
+          "confirm": "Ich habe verstanden, dass die Gerätedaten zurückgesetzt werden"
+        },
+        "submit": "Verbrauchsdaten zurücksetzen"
+      },
+      "factory_reset": {
+        "title": "Stecker auf Werkseinstellungen zurücksetzen",
+        "description": "Dies setzt die Geräteeinstellungen und die PIN zurück. Home Assistant prüft nach dem Befehl die Werkseinstellung 0000. Nur mit einer unkritischen Last verwenden.",
+        "data": {
+          "confirm": "Ich habe verstanden und möchte den Stecker auf Werkseinstellungen zurücksetzen"
+        },
+        "submit": "Werkseinstellungen wiederherstellen"
       }
     },
     "error": {
-      "invalid_pin": "Die PIN muss genau vier Dezimalziffern enthalten."
+      "invalid_pin": "Die PIN muss genau vier Dezimalziffern enthalten.",
+      "pin_mismatch": "Die beiden PIN-Eingaben stimmen nicht überein.",
+      "invalid_duration": "Die Dauer muss zwischen einer Sekunde und 365 Tagen liegen.",
+      "confirmation_required": "Vor dem Fortfahren muss die Bestätigung aktiviert werden.",
+      "operation_failed": "Der Vorgang ist fehlgeschlagen: {error}",
+      "invalid_datetime": "Das ausgewählte Datum oder die Uhrzeit ist ungültig."
+    },
+    "abort": {
+      "pin_changed": "Der Stecker hat die neue PIN übernommen und Home Assistant hat sie durch eine neue Anmeldung geprüft.",
+      "pin_reset": "Die Stecker-PIN wurde auf 0000 zurückgesetzt und geprüft.",
+      "timer_started": "Der Timer wurde im Stecker gespeichert.",
+      "timer_stopped": "Der Timer wurde gestoppt.",
+      "schedule_saved": "Der Zeitplan wurde im Stecker gespeichert.",
+      "schedule_removed": "Der Zeitplan wurde aus dem Stecker entfernt.",
+      "no_schedules": "Der Stecker meldet derzeit keine Zeitpläne, die bearbeitet oder entfernt werden können.",
+      "schedule_load_failed": "Die Zeitpläne konnten nicht geladen werden: {error}",
+      "consumption_reset": "Die im Stecker gespeicherten Verbrauchsdaten wurden zurückgesetzt.",
+      "factory_reset": "Das Zurücksetzen auf Werkseinstellungen wurde abgeschlossen und die Standard-PIN 0000 geprüft."
+    }
+  },
+  "selector": {
+    "switch_action": {
+      "options": {
+        "turn_on": "Einschalten",
+        "turn_off": "Ausschalten"
+      }
+    },
+    "schedule_status": {
+      "options": {
+        "enabled": "Aktiv",
+        "disabled": "Deaktiviert"
+      }
+    },
+    "weekdays": {
+      "options": {
+        "mon": "Montag",
+        "tue": "Dienstag",
+        "wed": "Mittwoch",
+        "thu": "Donnerstag",
+        "fri": "Freitag",
+        "sat": "Samstag",
+        "sun": "Sonntag"
+      }
     }
   }
 }

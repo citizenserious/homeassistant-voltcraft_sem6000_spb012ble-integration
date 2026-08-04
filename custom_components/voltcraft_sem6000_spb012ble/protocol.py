@@ -166,7 +166,26 @@ def validate_notify_frame(payload: bytes | bytearray) -> bytes:
     actual_checksum = frame[checksum_index]
     expected_checksum = (1 + sum(frame[2:checksum_index])) & 0xFF
     if actual_checksum != expected_checksum:
-        raise ValueError("Invalid SEM6000 frame checksum")
+        # The tested SEM6000 firmware returns read-only consumption-history
+        # blocks with a checksum that does not follow the normal
+        # ``1 + sum(payload)`` rule. Their wire shapes are fixed by range:
+        # 24 hours = 24 x 2-byte values, 30 days = 30 x 4-byte values,
+        # 12 months = 12 x 4-byte values. Accept only those exact response
+        # shapes after the generic header, length and FFFF-suffix checks above.
+        # Every command that changes state, authenticates or acknowledges an
+        # operation keeps strict checksum validation.
+        history_shapes: dict[int, tuple[int, int, int]] = {
+            int(Command.CONSUMPTION_DAY): (0x33, 55, 52),
+            int(Command.CONSUMPTION_MONTH): (0x7B, 127, 124),
+            int(Command.CONSUMPTION_YEAR): (0x33, 55, 52),
+        }
+        is_observed_history_frame = (
+            subcommand == 0
+            and command in history_shapes
+            and (length, len(frame), checksum_index) == history_shapes[command]
+        )
+        if not is_observed_history_frame:
+            raise ValueError("Invalid SEM6000 frame checksum")
     return frame
 
 
@@ -744,7 +763,7 @@ def parse_notify_payload(
         return ScheduleStatusNotifyPayload(count, tuple(entries))
 
     if command == Command.GET_SERIAL:
-        serial = args.rstrip(b"\0").decode("ascii", errors="replace")
+        serial = args.strip(b"\0 \t\r\n").decode("ascii", errors="replace").strip()
         return SerialNotifyPayload(serial)
 
     # Generic acknowledgements. 0x0f embeds its operation as the first arg;
