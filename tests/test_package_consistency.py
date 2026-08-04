@@ -43,11 +43,11 @@ class PackageConsistencyTests(unittest.TestCase):
             source,
         )
 
-    def test_manifest_is_beta_6_and_uses_core_bluetooth_packages(self) -> None:
+    def test_manifest_is_beta_7_and_uses_core_bluetooth_packages(self) -> None:
         manifest = json.loads(
             (COMPONENT / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["version"], "2.0.0-beta.6")
+        self.assertEqual(manifest["version"], "2.0.0-beta.7")
         self.assertEqual(manifest["codeowners"], ["@citizenserious"])
         self.assertNotIn("requirements", manifest)
         self.assertIn("bluetooth", manifest["dependencies"])
@@ -58,6 +58,13 @@ class PackageConsistencyTests(unittest.TestCase):
         self.assertIn("vol.Optional(CONF_PIN): _PIN_SELECTOR", source)
         self.assertNotIn("current_pin", source)
         self.assertNotIn("default=current_pin", source)
+
+    def test_integration_is_config_entry_only(self) -> None:
+        source = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+        self.assertIn(
+            "CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)",
+            source,
+        )
 
     def test_destructive_actions_are_admin_only_and_confirmed(self) -> None:
         source = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
