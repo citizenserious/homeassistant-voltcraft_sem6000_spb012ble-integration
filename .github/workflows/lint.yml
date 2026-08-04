@@ -33,6 +33,7 @@ jobs:
           custom_components/voltcraft_sem6000_spb012ble/protocol.py
           custom_components/voltcraft_sem6000_spb012ble/security.py
           custom_components/voltcraft_sem6000_spb012ble/coordinator.py
+          custom_components/voltcraft_sem6000_spb012ble/coordinator_extended.py
           tests
 
   type-check:
@@ -75,6 +76,7 @@ jobs:
           custom_components/voltcraft_sem6000_spb012ble/protocol.py
           custom_components/voltcraft_sem6000_spb012ble/security.py
           custom_components/voltcraft_sem6000_spb012ble/coordinator.py
+          custom_components/voltcraft_sem6000_spb012ble/coordinator_extended.py
           tests
 
       - name: Run regression tests
